@@ -15,10 +15,12 @@ function saveExperimentData(filenameSuffix = "") {
         .values()[0];
 
     const responses = vpnForm && vpnForm.response ? vpnForm.response : null;
-    const hasVpn = responses && responses["Participant-ID"];
-    const baseName = hasVpn
-      ? `DirFor1_VP${responses["Participant-ID"]}`
-      : "DirFor1_NoVPN";
+    const participantId =
+      (responses && responses["Probandennummer"]) ||
+      (responses && responses["Participant-ID"]);
+    const baseName = participantId
+      ? `DirForScreening_${participantId}`
+      : "DirForScreening_NoVPN";
     const filename = `${baseName}${suffix}.csv`;
     jsPsych.data.get().localSave("csv", filename);
   } catch (error) {

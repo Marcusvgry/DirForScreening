@@ -34,6 +34,69 @@ const CBC_VPNNummer = {
 // Screening-Fragebogen mit SurveyJS (jsPsychSurvey) inklusive aller Ausschluss- und Folgefragen.
 const screeningElements = [
   {
+    type: "html",
+    name: "heading_allgemein",
+    html: "<h3>1. Allgemeine Informationen</h3>",
+  },
+  {
+    type: "radiogroup",
+    name: "biologisches_geschlecht",
+    title: "Biologisches Geschlecht:",
+    choices: ["männlich", "weiblich", "divers", "keine Angabe"],
+  },
+  {
+    type: "radiogroup",
+    name: "schulabschluss",
+    title: "Höchster erreichter Schulabschluss:",
+    choices: [
+      "kein Abschluss",
+      "Volks-Hauptschule",
+      "Mittlere Reife",
+      "Abitur/Fachabitur",
+    ],
+  },
+  {
+    type: "radiogroup",
+    name: "berufsabschluss",
+    title: "Erreichter Berufsabschluss:",
+    description: "Mindestens Fachhochschulreife",
+    choices: [
+      "Keine Berufsausbildung",
+      "Lehre/Ausbildung",
+      "Fachhochschule",
+      "Hochschule",
+    ],
+  },
+  {
+    type: "radiogroup",
+    name: "beschaeftigung",
+    title: "Derzeitige Beschäftigung:",
+    choices: [
+      "ohne Beschäftigung",
+      "Hartz-IV/ Bürgergeld",
+      "ALG I",
+      "Gelegenheitsjob",
+      "1€-Job",
+      "Zeitarbeitsfirma",
+      "feste Anstellung",
+      "selbstständig",
+      "EU/BU-Rente",
+      "Altersrente",
+      "Studierend",
+    ],
+  },
+  {
+    type: "comment",
+    name: "allgemein_sonstiges",
+    title: "Sonstiges",
+    placeholder: "Sonstige Informationen",
+  },
+  {
+    type: "html",
+    name: "heading_alter",
+    html: "<h3>2. Alter, Händigkeit und Sehschwäche</h3>",
+  },
+  {
     type: "text",
     name: "geburtsdatum",
     title: "Geburtsdatum",
@@ -44,23 +107,15 @@ const screeningElements = [
     type: "text",
     name: "alter",
     title: "Alter",
-    description: "Nur Teilnehmende zwischen 18 und 35 Jahren sind zugelassen.",
+    description: "Zwischen 18 und 35 Jahre.",
     inputType: "number",
     isRequired: true,
-    validators: [
-      {
-        type: "numeric",
-        minValue: 18,
-        maxValue: 35,
-        text: "Bitte ein Alter zwischen 18 und 35 Jahren angeben.",
-      },
-    ],
   },
   {
     type: "radiogroup",
     name: "haendigkeit",
-    title: "H�ndigkeit",
-    choices: ["Rechtsh�ndig", "Linksh�ndig", "Beidh�ndig"],
+    title: "Händigkeit",
+    choices: ["Rechtshändig", "Linkshändig", "Beidhändig"],
     isRequired: true,
   },
   {
@@ -73,7 +128,7 @@ const screeningElements = [
   {
     type: "radiogroup",
     name: "sehschwaeche_ausgeglichen",
-    title: "Ist Ihre Sehschw�che damit ausgeglichen?",
+    title: "Ist Ihre Sehschwäche damit ausgeglichen?",
     choices: ["Ja", "Nein"],
     visibleIf: "{brille_kontaktlinsen} = 'Ja'",
     isRequired: true,
@@ -107,35 +162,46 @@ const screeningElements = [
   {
     type: "comment",
     name: "sehfaehigkeit_sonstiges",
-    title: "Sonstiges (Sehf�higkeit)",
-    placeholder: "Weitere Hinweise zur Sehf�higkeit",
+    title: "Sonstiges",
+    placeholder: "Sonstige Informationen",
+  },
+  {
+    type: "html",
+    name: "heading_betreuung_schwangerschaft",
+    html: "<h3>3. Betreuung und Schwangerschaft</h3>",
   },
   {
     type: "radiogroup",
     name: "gesetzliche_betreuung",
     title: "Werden Sie gesetzlich betreut?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    description: "Wenn ja, sofortiger Ausschluss",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "schwangerschaft",
-    title: "Schwangerschaft oder m�gliche Schwangerschaft?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    title: "Schwangerschaft oder mögliche Schwangerschaft?",
+    description: "wenn ja, sofortiger Ausschluss",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "comment",
     name: "betreuung_sonstiges",
-    title: "Sonstiges (Betreuung/Schwangerschaft)",
-    placeholder: "Weitere Informationen",
+    title: "Sonstiges",
+    placeholder: "Sonstige Informationen",
+  },
+  {
+    type: "html",
+    name: "heading_drogen",
+    html: "<h3>4. Drogen</h3>",
   },
   {
     type: "text",
     name: "zigaretten_gesamt",
-    title: "Wie viele Zigaretten haben Sie bisher in Ihrem Leben insgesamt geraucht?",
+    title:
+      "Wie viele Zigaretten haben Sie bisher in Ihrem Leben insgesamt geraucht?",
     inputType: "number",
     min: 0,
   },
@@ -143,14 +209,14 @@ const screeningElements = [
     type: "radiogroup",
     name: "rauchen_aktuell",
     title: "Rauchen Sie derzeit mehr als 2 Zigaretten pro Woche?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    description: "wenn ja, sofortiger Ausschluss",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "alkohol_tage_pro_woche",
-    title: "Wie oft nehmen Sie alkoholische Getr�nke zu sich? (Tage pro Woche)",
+    title: "Wie oft nehmen Sie alkoholische Getränke zu sich? (Tage pro Woche)",
     inputType: "number",
     min: 0,
     max: 7,
@@ -159,16 +225,17 @@ const screeningElements = [
     type: "text",
     name: "alkohol_glaser",
     title:
-      "Wenn Sie alkoholische Getr�nke zu sich nehmen, wie viel trinken Sie typischerweise an einem Tag? (Anzahl Gl�ser)",
+      "Wenn Sie alkoholische Getränke zu sich nehmen, wie viel trinken Sie typischerweise an einem Tag? (Anzahl Gläser)",
     description:
-      "Ein Standardgetr�nk (12 g Alkohol) entspricht ca. 0,3 l Bier (5 %), 0,1 l Wein oder Sekt (12,5 %), 2 cl Schnaps (55 %) oder 4 cl Lik�r (30 %).",
+      "Ein Standardgetränk (12 g Alkohol) entspricht ca. 0,3 l Bier (5 %), 0,1 l Wein oder Sekt (12,5 %), 2 cl Schnaps (55 %) oder 4 cl Likör (30 %).",
     inputType: "number",
     min: 0,
   },
   {
     type: "text",
     name: "alkohol_binge",
-    title: "Wie oft trinken Sie 6 oder mehr Gl�ser Alkohol bei einer Gelegenheit?",
+    title:
+      "Wie oft trinken Sie 6 oder mehr Gläser Alkohol bei einer Gelegenheit?",
     inputType: "number",
     min: 0,
   },
@@ -182,13 +249,13 @@ const screeningElements = [
   {
     type: "text",
     name: "thc_haeufigkeit",
-    title: "Wie h�ufig haben Sie THC konsumiert?",
+    title: "Wie häufig haben Sie THC konsumiert?",
     visibleIf: "{thc_konsum} = 'Ja'",
   },
   {
     type: "text",
     name: "thc_zeitraum",
-    title: "�ber welchen Zeitraum wurde THC konsumiert?",
+    title: "Über welchen Zeitraum wurde THC konsumiert?",
     visibleIf: "{thc_konsum} = 'Ja'",
   },
   {
@@ -200,26 +267,27 @@ const screeningElements = [
   {
     type: "radiogroup",
     name: "andere_drogen",
-    title: "Haben Sie andere Drogen konsumiert (z.B. Amphetamine, LSD, Kokain)?",
+    title:
+      "Haben Sie andere Drogen konsumiert (z.B. Amphetamine, LSD, Kokain)?",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "andere_drogen_was",
-    title: "Welche Substanzen wurden konsumiert?",
+    title: "Was haben Sie konsumiert?",
     visibleIf: "{andere_drogen} = 'Ja'",
   },
   {
     type: "text",
     name: "andere_drogen_haeufigkeit",
-    title: "Wie h�ufig haben Sie diese Substanzen konsumiert?",
+    title: "Wie häufig haben Sie konsumiert?",
     visibleIf: "{andere_drogen} = 'Ja'",
   },
   {
     type: "text",
     name: "andere_drogen_zeitraum",
-    title: "�ber welchen Zeitraum wurden die Substanzen konsumiert?",
+    title: "Über welchen Zeitraum wurde die Substanz konsumiert?",
     visibleIf: "{andere_drogen} = 'Ja'",
   },
   {
@@ -231,26 +299,32 @@ const screeningElements = [
   {
     type: "comment",
     name: "drogen_sonstiges",
-    title: "Sonstige Informationen zum Drogenkonsum",
+    title: "Sonstige Informationen",
+  },
+  {
+    type: "html",
+    name: "heading_medikamente_krankheiten",
+    html: "<h3>5. Medikamente & Krankheitsgeschichte</h3>",
   },
   {
     type: "radiogroup",
     name: "psychische_erkrankung",
-    title: "Leiden Sie unter einer diagnostizierten psychischen Erkrankung (z.B. Depression, Phobien, Schizophrenie)?",
+    title:
+      "Leiden Sie unter einer diagnostizierten psychischen Erkrankung (z.B. Depression, Phobien, Schizophrenie)?",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "psychische_erkrankung_details",
-    title: "Wenn ja, welche?",
+    title: "Welche?",
     visibleIf: "{psychische_erkrankung} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "psychische_medikation",
-    title: "Nehmen Sie hierf�r Medikamente regelm��ig ein?",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
     choices: ["Ja", "Nein"],
     visibleIf: "{psychische_erkrankung} = 'Ja'",
     isRequired: true,
@@ -258,35 +332,35 @@ const screeningElements = [
   {
     type: "text",
     name: "psychische_medikation_details",
-    title: "Wenn ja, welche und wie viel?",
+    title: "Welche und wie viel?",
     visibleIf: "{psychische_medikation} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "psychotherapie_aktuell",
-    title: "Sind Sie daf�r derzeit in psychotherapeutischer Behandlung?",
+    title: "Sind Sie dafür derzeit in psychotherapeutischer Behandlung?",
     choices: ["Ja", "Nein"],
     visibleIf: "{psychische_erkrankung} = 'Ja'",
   },
   {
     type: "radiogroup",
     name: "koerperliche_chronisch",
-    title: "Leiden Sie unter k�rperlichen chronischen Erkrankungen?",
+    title: "Leiden Sie unter körperlichen chronischen Erkrankungen?",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "koerperliche_chronisch_details",
-    title: "Wenn ja, welche?",
+    title: "Welche?",
     visibleIf: "{koerperliche_chronisch} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "koerperliche_chronisch_medikation",
-    title: "Nehmen Sie hierf�r Medikamente regelm��ig ein?",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
     choices: ["Ja", "Nein"],
     visibleIf: "{koerperliche_chronisch} = 'Ja'",
     isRequired: true,
@@ -294,28 +368,29 @@ const screeningElements = [
   {
     type: "text",
     name: "koerperliche_chronisch_medikation_details",
-    title: "Wenn ja, welche und wie viel?",
+    title: "Welche und wie viel?",
     visibleIf: "{koerperliche_chronisch_medikation} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "weitere_erkrankung_1",
-    title: "Leiden Sie unter weiteren k�rperlichen oder psychischen Erkrankungen? (1)",
+    title:
+      "Leiden Sie unter weiteren körperlichen oder psychischen Erkrankungen? (1)",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "weitere_erkrankung_1_details",
-    title: "Wenn ja, welche?",
+    title: "Welche?",
     visibleIf: "{weitere_erkrankung_1} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "weitere_erkrankung_1_medikation",
-    title: "Nehmen Sie hierf�r Medikamente regelm��ig ein?",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
     choices: ["Ja", "Nein"],
     visibleIf: "{weitere_erkrankung_1} = 'Ja'",
     isRequired: true,
@@ -323,14 +398,15 @@ const screeningElements = [
   {
     type: "text",
     name: "weitere_erkrankung_1_medikation_details",
-    title: "Wenn ja, welche und wie viel?",
+    title: "Welche und wie viel?",
     visibleIf: "{weitere_erkrankung_1_medikation} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "weitere_erkrankung_2",
-    title: "Leiden Sie unter weiteren k�rperlichen oder psychischen Erkrankungen? (2)",
+    title:
+      "Leiden Sie unter weiteren körperlichen oder psychischen Erkrankungen? (2)",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
@@ -344,7 +420,7 @@ const screeningElements = [
   {
     type: "radiogroup",
     name: "weitere_erkrankung_2_medikation",
-    title: "Nehmen Sie hierf�r Medikamente regelm��ig ein?",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
     choices: ["Ja", "Nein"],
     visibleIf: "{weitere_erkrankung_2} = 'Ja'",
     isRequired: true,
@@ -352,97 +428,109 @@ const screeningElements = [
   {
     type: "text",
     name: "weitere_erkrankung_2_medikation_details",
-    title: "Wenn ja, welche und wie viel?",
+    title: "Welche und wie viel?",
     visibleIf: "{weitere_erkrankung_2_medikation} = 'Ja'",
     isRequired: true,
   },
   {
     type: "comment",
     name: "krankheiten_sonstiges",
-    title: "Sonstige Erkrankungen oder Hinweise",
+    title: "Sonstiges",
+    placeholder: "Weitere Erkrankungen oder Sonstiges",
   },
   {
     type: "radiogroup",
     name: "psychotherapie_je",
-    title: "Waren Sie irgendwann in Ihrem Leben in psychiatrischer oder psychotherapeutischer Behandlung?",
+    title:
+      "Waren Sie irgendwann in Ihrem Leben in psychiatrischer oder psychotherapeutischer Behandlung?",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "psychotherapie_grund",
-    title: "Wenn ja, weswegen?",
+    title: "Weswegen? (kurze Beschreibung)",
     visibleIf: "{psychotherapie_je} = 'Ja'",
     isRequired: true,
   },
   {
     type: "text",
     name: "psychotherapie_medikation",
-    title: "Wenn ja, welche Medikamente wurden eingenommen?",
+    title: "Welche Medikamente wurden eingenommen?",
     visibleIf: "{psychotherapie_je} = 'Ja'",
   },
   {
     type: "radiogroup",
     name: "medikation_6_monate",
-    title: "Gab es verschreibungspflichtige Medikamente, die Sie in den letzten 6 Monaten eingenommen haben?",
+    title:
+      "Gab es verschreibungspflichtige Medikamente, die Sie in den letzten 6 Monaten eingenommen haben?",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "medikation_6_monate_details",
-    title: "Wenn ja, welche?",
+    title: "Welche?",
     visibleIf: "{medikation_6_monate} = 'Ja'",
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "psychopharmaka_14_tage",
-    title: "Wurden Psychopharmaka oder sonstige Ausschluss-Medikamente innerhalb der letzten 14 Tage genommen?",
+    title:
+      "Wurden Psychopharmaka oder sonstige Ausschluss-Medikamente innerhalb der letzten 14 Tage genommen?",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "comment",
     name: "medikation_sonstiges",
-    title: "Sonstige Informationen zu Medikamenten",
+    title: "Sonstiges",
+    placeholder: "Sonstige Informationen",
+  },
+  {
+    type: "html",
+    name: "heading_schlaf",
+    html: "<h3>6. Schlaf</h3>",
   },
   {
     type: "radiogroup",
     name: "schlafstoerung",
     title:
-      "Leiden Sie unter bekannten Schlafst�rungen (z.B. Schlafapnoe, Narkolepsie, Restless-Leg-Syndrom, Insomnie)?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+      "Leiden Sie unter bekannten Schlafstörungen wie zum Beispiel Schlaf-apnoe, Narkolepsie, Restless-Leg-Syndrom, Insomnie)?",
+    description: "sofortiger Ausschluss bei ja",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "schlafstoerung_details",
-    title: "Wenn ja, welche der beschriebenen Erkrankungen?",
+    title: "Welche der beschriebenen Erkrankungen?",
     visibleIf: "{schlafstoerung} = 'Ja'",
   },
   {
     type: "radiogroup",
     name: "schichtarbeit",
-    title: "Arbeiten Sie im Schichtsystem mit Nachtschichten oder machen Sie Nachtarbeit?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    title:
+      "Arbeiten Sie im Schichtsystem mit Nachtschichten oder machen Sie Nachtarbeit?",
+    description: "sofortiger Ausschluss bei ja",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "mittagsschlaf_mehr_als_drei",
-    title: "Machen Sie mehr als 3 Mittagschl�fe pro Woche?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    title: "Machen Sie mehr als 3 Mittagsschläfe pro Woche?",
+    description: "sofortiger Ausschluss bei ja",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "einschlafzeit_lang",
-    title: "Brauchen Sie l�nger als 60-90 Minuten zum Einschlafen, nachdem Sie sich hingelegt haben?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    title:
+      "Brauchen Sie länger als 60-90 Minuten zum Einschlafen, nachdem Sie sich hingelegt haben?",
+    description: "sofortiger Ausschluss bei ja",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
@@ -450,36 +538,40 @@ const screeningElements = [
     type: "radiogroup",
     name: "einschlafzeit_extrem",
     title: "Schlafen Sie normalerweise vor 21:00 Uhr oder nach 1:00 Uhr ein?",
-    description: 'Antwort "Ja" f�hrt zum sofortigen Ausschluss.',
+    description: "sofortiger Ausschluss bei ja",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "nachts_aufstehen",
-    title: "M�ssen Sie nachts �fter als 2 Mal pro Nacht aufstehen und aus dem Bett?",
+    title:
+      "Müssen Sie nachts öfter als 2 Mal pro Nacht aufstehen und aus dem Bett (beispielsweise um auf Toilette zu gehen)?",
+    description: "notieren für Messperson",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "radiogroup",
     name: "zeitverschiebung",
-    title: "Waren Sie in den letzten Wochen auf Reisen mit mehr als 2 Stunden Zeitverschiebung?",
+    title:
+      "Waren Sie in den letzten Wochen auf Reisen mit mehr als 2 Stunden Zeitverschiebung?",
     description:
-      "Faustregel: 1 Woche Erholung pro Stunde Zeitverschiebung (z.B. 3 Stunden Unterschied = mindestens 3 Wochen zur�ckliegen).",
+      "1 Woche Erholung pro Stunde Zeitverschiebung 1 Woche für 1 Stunde Zeitverschiebung; also wenn Proband:in in einem Land mit 3 Stunden Zeitverschiebung war, muss es mindestens 3 Wochen zurück liegen).",
     choices: ["Ja", "Nein"],
     isRequired: true,
   },
   {
     type: "text",
     name: "zeitverschiebung_wo",
-    title: "Wenn ja, wo?",
+    title: "Wo? (Land eintragen)",
     visibleIf: "{zeitverschiebung} = 'Ja'",
   },
   {
     type: "comment",
     name: "schlaf_sonstiges",
-    title: "Sonstige Informationen zum Schlaf",
+    title: "Sonstiges",
+    placeholder: "Sonstige Informationen",
   },
 ];
 
@@ -498,7 +590,8 @@ const demographics_block = {
     ],
   },
   data: { form_id: "screening" },
-};const instructions = {
+};
+const instructions = {
   type: jsPsychInstructions,
   pages: [
     `<div class="instructions">
@@ -547,109 +640,3 @@ const demographics_block = {
   button_label_next: "Weiter",
   allow_backward: false,
 };
-
-const instructions_2 = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-        <p>In diesem Beispiel hätten Sie sich nur die Wörter "Sonne" und "Rose" für den späteren Gedächtnistest merken sollen.</p>
-<p>Das andere Wort hätten Sie vergessen sollen.</p>
-        </div>`,
-    `<div class="instructions">
-    <p>Zusammenfassung:</p>
-
-<p>Sie sehen gleich eine Reihe von Wörtern hintereinander. Von diesen Wörtern sollen Sie sich nur die Wörter einprägen, auf die die Buchstabenkombination <b>EEE</b> folgt.</p>
-        </div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Weiter",
-  allow_backward: false,
-};
-
-const instructions_3 = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-       <p>Bevor die richtige Lernphase beginnt, folgt nun eine Übung, in der Sie sich mit Ihrer Aufgabe vertraut machen können.</p>
-
-<p>Drücken Sie den Button, um die Übung für die Lernphase zu starten.</p>
- </p>
-        </div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Übungsdurchgang beginnen",
-  allow_backward: false,
-};
-
-const instructions_4 = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-    <p> Nun folgt der Gedächtnistest. Zunächst einmal bitten wir Sie, alle Wörter, die Sie auch erinnern sollten, frei aus dem Gedächtnis abzurufen. </p>
-    <p> Sobald Sie ein Wort eingegeben haben, können Sie Ihre Eingabe mit der Enter-Taste bestätigen. Sobald Ihnen keine Wörter mehr einfallen, können Sie mit dem Fertig-Button fortfahren. Sie müssen dann noch bestätigen, dass Sie wirklich fortfahren wollen sowie ein weiteres Mal auf den Fertig-Button klicken.</p>
-</div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Gedächtnistest beginnen",
-  allow_backward: false,
-};
-
-const instructions_5 = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-        <p> In der vorherigen Lernphase hatten wir Ihnen 6 Wörter präsentiert, die Sie erinnern sollten. <br>
-         Wir zeigen Ihnen von diesen Wörtern jetzt jeweils die ersten beiden Buchstaben und möchten Sie bitten, das Wort 
-         dann entsprechend zu vervollständigen. <br> Auch wenn sie das Wort eben schon korrekt erinnert haben, sollen Sie es
-          trotzdem noch einmal in diesem Test vervollständigen., </p>
-          <p> Ihre Eingabe bestätigen Sie bitte wieder mit der Enter-Taste. Beim letzten Word erscheint der Fertig-Button, mit dem Sie Fortfahren können. Das Bestätigen mit der Enter Taste funktioniert beim letzten Wort nicht mehr. Tippen Sie das Wort ein und klicken Sie dann auf den Fertig-Button, Ihre Eingabe wird gespeichert.</p>
-        </div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Vervollständigungsaufgabe beginnen",
-  allow_backward: false,
-};
-
-const instructions_unrelatedSound = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-        <p>Bevor Sie mit der eigentlichen Aufgabe beginnen, werden wir Ihnen noch einen Ton präsentieren. Hierbei müssen Sie nichts tun und keine Aufgabe erledigen. Bitte hören Sie trotzdem aufmerksam zu und schauen Sie auf das Kreuz in der Mitte des Bildschirms.</p>
-      </div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Beginnen",
-  allow_backward: false,
-};
-
-const instructions_6 = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-        <p> Das war der Übungsdurchgang. </p>
-        <p> Bevor wir mit der eigentlichen Lernphase beginnen, werden wir Sie noch mit den Tönen vertraut machen, die Sie während der Lernphase hören werden. </p>
-        <p> Insgesamt gibt es in der Lernphase vier verschieden Töne. Zwei davon werden nur mit der Buchstabenkombination <b>EEE</b> und zwei nur mit der Buchstabenkombination <b>VVV</b> abgespielt. </p>
-        <p> Wenn Sie auf "Weiter" klicken, wird der erste Ton abgespielt. In der Anweisung steht außerdem, ob der Ton mit <b>EEE</b> oder <b>VVV</b> abgespielt wird. </p>
-        <p> Insgesamt können Sie sich jeden Ton bis zu dreimal anhören. </p>
-        </div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Weiter",
-  allow_backward: false,
-};
-
-const instructions_7 = {
-  type: jsPsychInstructions,
-  pages: [
-    `<div class="instructions">
-        <p> Haben Sie noch Fragen zur Lernphase oder zu Ihrer Aufgabe? </p>
-        <p> Falls Sie noch Fragen haben, wenden Sie sich bitte jetzt an die Versuchsleitung. </p>
-        <p> Wenn Sie keine Fragen mehr haben, drücken Sie den Button unten, um die Wörter für den späteren Gedächtnistest zu lernen. </p>
-        <p> Bitte stellen Sie sich darauf ein, dass Sie jetzt in dieser Lernphase mehr Wörter präsentiert bekommen werden als in den Übungsdurchgängen </p>
-        </div>`,
-  ],
-  show_clickable_nav: true,
-  button_label_next: "Lernphase beginnen",
-  allow_backward: false,
-};
-

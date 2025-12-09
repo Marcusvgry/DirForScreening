@@ -476,14 +476,13 @@ body {
   height: 3em;
 }
 
-/* Custom (larger) radio buttons */
-
-input[type="radio"]:checked {
+/* Custom (larger) radio buttons (skip SurveyJS radios to avoid double markers) */
+input[type="radio"]:not(.sd-radio__control):checked {
   border-color: #006a60;
   background: #006a60;
 }
 
-input[type="radio"] {
+input[type="radio"]:not(.sd-radio__control) {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -497,7 +496,7 @@ input[type="radio"] {
   cursor: pointer;
 }
 
-input[type="radio"]:checked::after {
+input[type="radio"]:not(.sd-radio__control):checked::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -507,24 +506,6 @@ input[type="radio"]:checked::after {
   height: 0.8em;
   border-radius: 50%;
   background: white;
-}
-
-/* Reset radio styling inside SurveyJS to avoid double circles */
-.sv-root input[type="radio"],
-.sv-root input[type="radio"]:checked {
-  -webkit-appearance: radio;
-  -moz-appearance: radio;
-  appearance: radio;
-  width: auto;
-  height: auto;
-  border: initial;
-  background: initial;
-  position: static;
-}
-
-.sv-root input[type="radio"]::after,
-.sv-root input[type="radio"]:checked::after {
-  content: none;
 }
 
 /* Further adjustments for survey likert radio buttons */
