@@ -584,7 +584,8 @@ const demographics_block = {
     showQuestionNumbers: "off",
     pages: [
       {
-        title: "Screening",
+        title:
+          "Einleitungsgespräch: Für Forschungsinteresse bedanken; Inhalte heute: Informationen zur Studie geben; Fragen klären und Studieneignung feststellen. Haben Sie hierfür ca. 20-30 Minuten Zeit? Kurz die Studie erklären und nach Fragen fragen bevor es weiter geht?",
         elements: screeningElements,
       },
     ],
