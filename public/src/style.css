@@ -509,6 +509,24 @@ input[type="radio"]:checked::after {
   background: white;
 }
 
+/* Reset radio styling inside SurveyJS to avoid double circles */
+.sv-root input[type="radio"],
+.sv-root input[type="radio"]:checked {
+  -webkit-appearance: radio;
+  -moz-appearance: radio;
+  appearance: radio;
+  width: auto;
+  height: auto;
+  border: initial;
+  background: initial;
+  position: static;
+}
+
+.sv-root input[type="radio"]::after,
+.sv-root input[type="radio"]:checked::after {
+  content: none;
+}
+
 /* Further adjustments for survey likert radio buttons */
 .jspsych-survey-likert-opts li {
   display: inline-block;

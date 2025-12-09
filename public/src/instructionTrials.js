@@ -1,4 +1,504 @@
-const instructions = {
+const CBC_VPNNummer = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: ``,
+  html: `
+        <style>
+          .cbc-form { width: 100%; max-width: 1100px; margin: 0 auto; }
+          .cbc-row { display: flex; gap: 16px; flex-wrap: wrap; }
+          .cbc-row .field { flex: 1 1 260px; min-width: 220px; }
+          .cbc-grid { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+          .cbc-grid .title { font-weight: bold; text-align: center; }
+          .cbc-grid .cell label { display: block; margin-bottom: 4px; text-align: center; }
+          .cbc-grid .cell select { width: 100%; }
+        </style>
+        <div class="survey-container cbc-form">
+    <div class="cbc-row">
+      <div class="field">
+        <p>Probandennummer</p>
+        <input type="number" id="Probandennummer" name="Probandennummer" required class="input-field"/>
+      </div>
+      <div class="field">
+        <p>Heutiges Datum</p>
+        <input type="date" id="Heutiges-Datum" name="Heutiges-Datum" required class="input-field"/>
+      </div>
+      <div class="field">
+        <p>Name der Messperson</p>
+        <input type="text" id="Name-der-Messperson" name="Name-der-Messperson" required class="input-field"/>
+      </div>
+    </div>   
+</div>
+    
+`,
+};
+
+// Screening-Fragebogen mit SurveyJS (jsPsychSurvey) inklusive aller Ausschluss- und Folgefragen.
+const screeningElements = [
+  {
+    type: "text",
+    name: "geburtsdatum",
+    title: "Geburtsdatum",
+    inputType: "date",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "alter",
+    title: "Alter",
+    description: "Nur Teilnehmende zwischen 18 und 35 Jahren sind zugelassen.",
+    inputType: "number",
+    isRequired: true,
+    validators: [
+      {
+        type: "numeric",
+        minValue: 18,
+        maxValue: 35,
+        text: "Bitte ein Alter zwischen 18 und 35 Jahren angeben.",
+      },
+    ],
+  },
+  {
+    type: "radiogroup",
+    name: "haendigkeit",
+    title: "Händigkeit",
+    choices: ["Rechtshändig", "Linkshändig", "Beidhändig"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "brille_kontaktlinsen",
+    title: "Tragen Sie eine Brille oder Kontaktlinsen?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "sehschwaeche_ausgeglichen",
+    title: "Ist Ihre Sehschwäche damit ausgeglichen?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{brille_kontaktlinsen} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "dioptrien_rechts",
+    title: "Dioptrien rechts",
+    inputType: "number",
+    step: 0.25,
+    visibleIf: "{brille_kontaktlinsen} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "dioptrien_links",
+    title: "Dioptrien links",
+    inputType: "number",
+    step: 0.25,
+    visibleIf: "{brille_kontaktlinsen} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "dioptrien_unter_6",
+    title: "Weniger als 6 Dioptrien?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{brille_kontaktlinsen} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "comment",
+    name: "sehfaehigkeit_sonstiges",
+    title: "Sonstiges (Sehfähigkeit)",
+    placeholder: "Weitere Hinweise zur Sehfähigkeit",
+  },
+  {
+    type: "radiogroup",
+    name: "gesetzliche_betreuung",
+    title: "Werden Sie gesetzlich betreut?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "schwangerschaft",
+    title: "Schwangerschaft oder mögliche Schwangerschaft?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "comment",
+    name: "betreuung_sonstiges",
+    title: "Sonstiges (Betreuung/Schwangerschaft)",
+    placeholder: "Weitere Informationen",
+  },
+  {
+    type: "text",
+    name: "zigaretten_gesamt",
+    title: "Wie viele Zigaretten haben Sie bisher in Ihrem Leben insgesamt geraucht?",
+    inputType: "number",
+    min: 0,
+  },
+  {
+    type: "radiogroup",
+    name: "rauchen_aktuell",
+    title: "Rauchen Sie derzeit mehr als 2 Zigaretten pro Woche?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "alkohol_tage_pro_woche",
+    title: "Wie oft nehmen Sie alkoholische Getränke zu sich? (Tage pro Woche)",
+    inputType: "number",
+    min: 0,
+    max: 7,
+  },
+  {
+    type: "text",
+    name: "alkohol_glaser",
+    title:
+      "Wenn Sie alkoholische Getränke zu sich nehmen, wie viel trinken Sie typischerweise an einem Tag? (Anzahl Gläser)",
+    description:
+      "Ein Standardgetränk (12 g Alkohol) entspricht ca. 0,3 l Bier (5 %), 0,1 l Wein oder Sekt (12,5 %), 2 cl Schnaps (55 %) oder 4 cl Likör (30 %).",
+    inputType: "number",
+    min: 0,
+  },
+  {
+    type: "text",
+    name: "alkohol_binge",
+    title: "Wie oft trinken Sie 6 oder mehr Gläser Alkohol bei einer Gelegenheit?",
+    inputType: "number",
+    min: 0,
+  },
+  {
+    type: "radiogroup",
+    name: "thc_konsum",
+    title: "Haben Sie jemals THC konsumiert?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "thc_haeufigkeit",
+    title: "Wie häufig haben Sie THC konsumiert?",
+    visibleIf: "{thc_konsum} = 'Ja'",
+  },
+  {
+    type: "text",
+    name: "thc_zeitraum",
+    title: "Über welchen Zeitraum wurde THC konsumiert?",
+    visibleIf: "{thc_konsum} = 'Ja'",
+  },
+  {
+    type: "text",
+    name: "thc_letzter_konsum",
+    title: "Wann fand der letzte THC-Konsum statt? (Datum oder Zeitraum)",
+    visibleIf: "{thc_konsum} = 'Ja'",
+  },
+  {
+    type: "radiogroup",
+    name: "andere_drogen",
+    title: "Haben Sie andere Drogen konsumiert (z.B. Amphetamine, LSD, Kokain)?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "andere_drogen_was",
+    title: "Welche Substanzen wurden konsumiert?",
+    visibleIf: "{andere_drogen} = 'Ja'",
+  },
+  {
+    type: "text",
+    name: "andere_drogen_haeufigkeit",
+    title: "Wie häufig haben Sie diese Substanzen konsumiert?",
+    visibleIf: "{andere_drogen} = 'Ja'",
+  },
+  {
+    type: "text",
+    name: "andere_drogen_zeitraum",
+    title: "Über welchen Zeitraum wurden die Substanzen konsumiert?",
+    visibleIf: "{andere_drogen} = 'Ja'",
+  },
+  {
+    type: "text",
+    name: "andere_drogen_letzter_konsum",
+    title: "Wann fand der letzte Konsum statt? (Datum oder Zeitraum)",
+    visibleIf: "{andere_drogen} = 'Ja'",
+  },
+  {
+    type: "comment",
+    name: "drogen_sonstiges",
+    title: "Sonstige Informationen zum Drogenkonsum",
+  },
+  {
+    type: "radiogroup",
+    name: "psychische_erkrankung",
+    title: "Leiden Sie unter einer diagnostizierten psychischen Erkrankung (z.B. Depression, Phobien, Schizophrenie)?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "psychische_erkrankung_details",
+    title: "Wenn ja, welche?",
+    visibleIf: "{psychische_erkrankung} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "psychische_medikation",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{psychische_erkrankung} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "psychische_medikation_details",
+    title: "Wenn ja, welche und wie viel?",
+    visibleIf: "{psychische_medikation} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "psychotherapie_aktuell",
+    title: "Sind Sie dafür derzeit in psychotherapeutischer Behandlung?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{psychische_erkrankung} = 'Ja'",
+  },
+  {
+    type: "radiogroup",
+    name: "koerperliche_chronisch",
+    title: "Leiden Sie unter körperlichen chronischen Erkrankungen?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "koerperliche_chronisch_details",
+    title: "Wenn ja, welche?",
+    visibleIf: "{koerperliche_chronisch} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "koerperliche_chronisch_medikation",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{koerperliche_chronisch} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "koerperliche_chronisch_medikation_details",
+    title: "Wenn ja, welche und wie viel?",
+    visibleIf: "{koerperliche_chronisch_medikation} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "weitere_erkrankung_1",
+    title: "Leiden Sie unter weiteren körperlichen oder psychischen Erkrankungen? (1)",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "weitere_erkrankung_1_details",
+    title: "Wenn ja, welche?",
+    visibleIf: "{weitere_erkrankung_1} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "weitere_erkrankung_1_medikation",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{weitere_erkrankung_1} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "weitere_erkrankung_1_medikation_details",
+    title: "Wenn ja, welche und wie viel?",
+    visibleIf: "{weitere_erkrankung_1_medikation} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "weitere_erkrankung_2",
+    title: "Leiden Sie unter weiteren körperlichen oder psychischen Erkrankungen? (2)",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "weitere_erkrankung_2_details",
+    title: "Wenn ja, welche?",
+    visibleIf: "{weitere_erkrankung_2} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "weitere_erkrankung_2_medikation",
+    title: "Nehmen Sie hierfür Medikamente regelmäßig ein?",
+    choices: ["Ja", "Nein"],
+    visibleIf: "{weitere_erkrankung_2} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "weitere_erkrankung_2_medikation_details",
+    title: "Wenn ja, welche und wie viel?",
+    visibleIf: "{weitere_erkrankung_2_medikation} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "comment",
+    name: "krankheiten_sonstiges",
+    title: "Sonstige Erkrankungen oder Hinweise",
+  },
+  {
+    type: "radiogroup",
+    name: "psychotherapie_je",
+    title: "Waren Sie irgendwann in Ihrem Leben in psychiatrischer oder psychotherapeutischer Behandlung?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "psychotherapie_grund",
+    title: "Wenn ja, weswegen?",
+    visibleIf: "{psychotherapie_je} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "psychotherapie_medikation",
+    title: "Wenn ja, welche Medikamente wurden eingenommen?",
+    visibleIf: "{psychotherapie_je} = 'Ja'",
+  },
+  {
+    type: "radiogroup",
+    name: "medikation_6_monate",
+    title: "Gab es verschreibungspflichtige Medikamente, die Sie in den letzten 6 Monaten eingenommen haben?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "medikation_6_monate_details",
+    title: "Wenn ja, welche?",
+    visibleIf: "{medikation_6_monate} = 'Ja'",
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "psychopharmaka_14_tage",
+    title: "Wurden Psychopharmaka oder sonstige Ausschluss-Medikamente innerhalb der letzten 14 Tage genommen?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "comment",
+    name: "medikation_sonstiges",
+    title: "Sonstige Informationen zu Medikamenten",
+  },
+  {
+    type: "radiogroup",
+    name: "schlafstoerung",
+    title:
+      "Leiden Sie unter bekannten Schlafstörungen (z.B. Schlafapnoe, Narkolepsie, Restless-Leg-Syndrom, Insomnie)?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "schlafstoerung_details",
+    title: "Wenn ja, welche der beschriebenen Erkrankungen?",
+    visibleIf: "{schlafstoerung} = 'Ja'",
+  },
+  {
+    type: "radiogroup",
+    name: "schichtarbeit",
+    title: "Arbeiten Sie im Schichtsystem mit Nachtschichten oder machen Sie Nachtarbeit?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "mittagsschlaf_mehr_als_drei",
+    title: "Machen Sie mehr als 3 Mittagschläfe pro Woche?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "einschlafzeit_lang",
+    title: "Brauchen Sie länger als 60-90 Minuten zum Einschlafen, nachdem Sie sich hingelegt haben?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "einschlafzeit_extrem",
+    title: "Schlafen Sie normalerweise vor 21:00 Uhr oder nach 1:00 Uhr ein?",
+    description: 'Antwort "Ja" führt zum sofortigen Ausschluss.',
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "nachts_aufstehen",
+    title: "Müssen Sie nachts öfter als 2 Mal pro Nacht aufstehen und aus dem Bett?",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "radiogroup",
+    name: "zeitverschiebung",
+    title: "Waren Sie in den letzten Wochen auf Reisen mit mehr als 2 Stunden Zeitverschiebung?",
+    description:
+      "Faustregel: 1 Woche Erholung pro Stunde Zeitverschiebung (z.B. 3 Stunden Unterschied = mindestens 3 Wochen zurückliegen).",
+    choices: ["Ja", "Nein"],
+    isRequired: true,
+  },
+  {
+    type: "text",
+    name: "zeitverschiebung_wo",
+    title: "Wenn ja, wo?",
+    visibleIf: "{zeitverschiebung} = 'Ja'",
+  },
+  {
+    type: "comment",
+    name: "schlaf_sonstiges",
+    title: "Sonstige Informationen zum Schlaf",
+  },
+];
+
+const demographics_block = {
+  type: jsPsychSurvey,
+  survey_json: {
+    title: "Screening",
+    widthMode: "static",
+    showProgressBar: "off",
+    showQuestionNumbers: "off",
+    pages: [
+      {
+        title: "Screening",
+        elements: screeningElements,
+      },
+    ],
+  },
+  data: { form_id: "screening" },
+};const instructions = {
   type: jsPsychInstructions,
   pages: [
     `<div class="instructions">
@@ -152,3 +652,4 @@ const instructions_7 = {
   button_label_next: "Lernphase beginnen",
   allow_backward: false,
 };
+
