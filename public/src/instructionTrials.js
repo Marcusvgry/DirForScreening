@@ -22,8 +22,8 @@ const CBC_VPNNummer = {
         <input type="date" id="Heutiges-Datum" name="Heutiges-Datum" required class="input-field"/>
       </div>
       <div class="field">
-        <p>Name der Messperson</p>
-        <input type="text" id="Name-der-Messperson" name="Name-der-Messperson" required class="input-field"/>
+        <p>Name der Screening-Person</p>
+        <input type="text" id="Name-der-Screening-Person" name="Name-der-Screening-Person" required class="input-field"/>
       </div>
     </div>   
 </div>
@@ -214,30 +214,38 @@ const screeningElements = [
     isRequired: true,
   },
   {
-    type: "text",
+    type: "dropdown",
     name: "alkohol_tage_pro_woche",
-    title: "Wie oft nehmen Sie alkoholische Getränke zu sich? (Tage pro Woche)",
-    inputType: "number",
-    min: 0,
-    max: 7,
+    title: "Wie oft nehmen Sie alkoholische Getränke zu sich?",
+    choices: [
+      "nie",
+      "1x im Monat oder weniger",
+      "2-4x im Monat",
+      "2-4x in der Woche",
+      "4x oder mehr in der Woche",
+    ],
   },
   {
-    type: "text",
+    type: "dropdown",
     name: "alkohol_glaser",
     title:
       "Wenn Sie alkoholische Getränke zu sich nehmen, wie viel trinken Sie typischerweise an einem Tag? (Anzahl Gläser)",
     description:
       "Ein Standardgetränk (12 g Alkohol) entspricht ca. 0,3 l Bier (5 %), 0,1 l Wein oder Sekt (12,5 %), 2 cl Schnaps (55 %) oder 4 cl Likör (30 %).",
-    inputType: "number",
-    min: 0,
+    choices: ["nie", "1 oder 2", "3 oder 4", "5 oder 6", "7-9", "10 oder mehr"],
   },
   {
-    type: "text",
+    type: "dropdown",
     name: "alkohol_binge",
     title:
       "Wie oft trinken Sie 6 oder mehr Gläser Alkohol bei einer Gelegenheit?",
-    inputType: "number",
-    min: 0,
+    choices: [
+      "Nie",
+      "Weniger als einmal im Monat",
+      "einmal im Monat",
+      "einmal in der Woche",
+      "täglich oder fast täglich",
+    ],
   },
   {
     type: "radiogroup",
