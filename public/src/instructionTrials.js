@@ -31,7 +31,6 @@ const CBC_VPNNummer = {
 `,
 };
 
-// Screening-Fragebogen mit SurveyJS (jsPsychSurvey) inklusive aller Ausschluss- und Folgefragen.
 const screeningElements = [
   {
     type: "html",
